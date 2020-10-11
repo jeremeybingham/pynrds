@@ -1,9 +1,58 @@
 # pynrds
 pynrds will eventually be a complete Python library for the NAR NRDS API Service.
 
-Watch this space! I'm working through prototyping calls and data structures with code coming soon. 
+Watch this space! I'm working through prototyping calls and data structures with code coming soon. The NRDS API has a pretty simple structure, so querying it is straightforward using the `requests` module: 
 
-Short-term goal is to create a test set of simulated data.
+```python
+import requests
+import json
+
+
+# NRDS API spec specifies 'MemberID' for NRDS id #
+member_id = '123456789'
+
+# UserRole is provided by NAR for API access
+user_role = 'abc-123-defg-4567'
+
+# SenderMemberId is the API user's NRDS id# (??)
+sender_member_id = '987654321'
+
+# NRDS Beta API url
+base_url = 'https://beta.api.realtor.org/data'
+
+# endpoint
+endpoint = '/members/'
+
+# put them together
+url = f'{base_url}{endpoint}{member_id}
+
+# create your payload of credentials
+payload = {
+    'UserRole'      : user_role,
+    'SenderMemberId': sender_member_id
+}
+
+# make the http request and return the result as a json object 'reply'
+reply = requests.post(url, payload).json()
+
+
+# or make the request with a function:
+def get_single_member(member_id):
+
+    payload = {
+        'UserRole'      : user_role,
+        'SenderMemberId': sender_member_id
+    }
+
+    url = f'{base_url}/members/{member_id}'
+
+    reply = requests.post(url, payload).json()
+    return(reply)
+```
+
+Additional endpoints and queries are similar, and I'll build them once I have a system to verify them on, but that's not really the challenge I'm interested in...
+
+The more interesting question, of course, is what can be done with JUST the data the NRDS API provides, using only Open-Source tools? For exploring those questions we're going to need sample data, so we can try new things and make complex mockups without the need to use or affect live NRDS information, or to post member data as part of learning how to use the data the API returns. So, my short-term goal is to create a full test set of simulated NRDS data that anyone can use, scale, and customize to their own needs, then create a dummy API for that test set that exactly mirrors the (typical, documented) behavior of the NRDS API. It should be possible to create a mock Association of any size, populate realistic but fake NRDS data to its "members", and then use it to test any imaginable application based on the NRDS API without the need to use it in early testing. 
 
 
 ### Update 10/10/20: 
@@ -11,7 +60,7 @@ Created and uploaded `get_member.py` which returns a `JSON` package of randomize
 
 Once I complete simulated data templates for all the NRDS endpoints I can create a stand-in API that will return realistic but fake NRDS-like data and let us quickly mock up queries and build realistic applications that can be expected to work with "real" NRDS data. Eventually, we'll create a whole fake Association's worth of NRDS records and store it so we can interact with it exactly like the NRDS API. There are some clues to the theme in the code...
 
-Example output below:
+Example output of `get_random_member()` below:
 
 ```json
 {
