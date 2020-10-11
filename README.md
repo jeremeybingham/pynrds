@@ -24,7 +24,7 @@ base_url = 'https://beta.api.realtor.org/data'
 endpoint = '/members/'
 
 # put them together
-url = f'{base_url}{endpoint}{member_id}
+url = f'{base_url}{endpoint}{member_id}'
 
 # create your payload of credentials
 payload = {
