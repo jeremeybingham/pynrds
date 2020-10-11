@@ -30,7 +30,7 @@ url = f'{base_url}{endpoint}{member_id}'
 payload = {
     'UserRole'      : user_role,
     'SenderMemberId': sender_member_id
-}
+    }
 
 # make the http request and return the result as a json object 'reply'
 reply = requests.post(url, payload).json()
@@ -42,7 +42,7 @@ def get_single_member(member_id):
     payload = {
         'UserRole'      : user_role,
         'SenderMemberId': sender_member_id
-    }
+        }
 
     url = f'{base_url}/members/{member_id}'
 
@@ -56,7 +56,7 @@ The more interesting question, of course, is what can be done with JUST the data
 
 
 ### Update 10/10/20: 
-Created and uploaded `get_member.py` which returns a `JSON` package of randomized member data in the same format as the NRDS API `/member/` endpoint. Tackled the easy elements first, this script will not generate simulated data for Certifications, Designations, etc (yet!) but the other information looks realistic enough for testing purposes. Ages, DOB, years of membership, NRDS insert dates, and all other info are random, but follow some rules to make the data realistic. The script's dependencies are all in the import section, notably `Delorean` and `Numpy`, as well as two different fake-data libraries: `mimesis` and `faker`, with `mimesis` doing the bulk of the work. The outputted addresses are a bit European in flavor, specifically British, but close enough. 
+Created and uploaded `get_member.py` which returns a `JSON` package of randomized member data in the same format as the NRDS API `/member/` endpoint. Tackled the easy elements first, this script will not generate simulated data for Certifications, Designations, etc (yet!) but the other information looks realistic enough for testing purposes. Ages, DOB, years of membership, NRDS insert dates, and all other info are random, but follow some rules to make the data realistic. The script's dependencies are all in the import section, notably `Delorean` and `Numpy`, as well as two different fake-data libraries: `mimesis` and `faker`, with `mimesis` doing the bulk of the work. The outputted addresses are a bit "European" in flavor, specifically British, but close enough. 
 
 Once I complete simulated data templates for all the NRDS endpoints I can create a stand-in API that will return realistic but fake NRDS-like data and let us quickly mock up queries and build realistic applications that can be expected to work with "real" NRDS data. Eventually, we'll create a whole fake Association's worth of NRDS records and store it so we can interact with it exactly like the NRDS API. There are some clues to the theme in the code...
 
