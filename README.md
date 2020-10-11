@@ -1,7 +1,7 @@
 # pynrds
 pynrds will eventually be a complete Python library for the NAR NRDS API Service.
 
-Watch this space! The NRDS API has a pretty simple structure, so querying it is straightforward using the `requests` module: 
+The NRDS API has a pretty simple structure, so querying it is straightforward using the `requests` module: 
 
 ```python
 import requests
