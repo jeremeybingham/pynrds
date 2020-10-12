@@ -1,5 +1,3 @@
-# get_member.py
-
 import datetime
 import json
 from delorean import Delorean, parse
@@ -8,6 +6,7 @@ from random import randint
 from mimesis.enums import Gender, TLDType
 from mimesis import Generic
 from faker import Faker
+import pandas as pd
 
 
 # import your mimesis and faker providers
@@ -21,6 +20,9 @@ StateAssociationId = '0862'
 # these values are for fun
 simp_state = 'OR'
 simp_area_codes = [636, 939]
+
+# corrected designations information list
+designations_list = [{'code': 'ABR', 'description': 'Accredited Buyers Representative'}, {'code': 'ALC', 'description': 'Accredited Land Consultant'}, {'code': 'CCIM', 'description': 'Certified Commercial Investment Member'}, {'code': 'CIPS', 'description': 'Certified International Property Specialist'}, {'code': 'CPM', 'description': 'Certified Property Manager'}, {'code': 'CRB', 'description': 'Certified Real Estate Brokerage Manager'}, {'code': 'CRS', 'description': 'Certified Residential Specialist'}, {'code': 'CRE', 'description': 'Counselor of Real Estate'}, {'code': 'GAA', 'description': 'General Accredited Appraiser'}, {'code': 'GREEN', 'description': 'NARs Green Designation'}, {'code': 'GRI', 'description': 'Graduate REALTOR Institute'}, {'code': 'PMN', 'description': 'Performance Management Network'}, {'code': 'RENE', 'description': 'Real Estate Negotiation Expert'}, {'code': 'RCE', 'description': 'REALTOR Association Certified Executive'}, {'code': 'RAA', 'description': 'Residential Accredited Appraiser'}, {'code': 'SRS', 'description': 'Seller Representative Specialist'}, {'code': 'SIOR', 'description': 'Society of Industrial and Office REALTORS'}, {'code': 'SRES', 'description': 'Seniors Real Estate Specialist'}]
 
 
 ## worker functions
@@ -247,6 +249,38 @@ def get_dues_paid_date():
     end_date = datetime.date(year=(last_year), month=12, day=30)
     return fake.date_between(start_date=start_date, end_date=end_date).strftime('%m-%d-%Y')
 
+# generate a random "Designations" section
+def generate_designations(member_id, join_date):
+    
+    # get datetime for join date
+    joined = parse(join_date).datetime
+    now = datetime.datetime.now()
+    
+    # create a blank list
+    designations = []
+    
+    # get a random number of designations
+    for i in range(1, randint(2,5)):
+        
+        # for each, choose from designations_list
+        dl = choice(designations_list)
+        
+        # add the designation and member info to a new dict and append it
+        ## TODO - allows duplicates, improve
+        designations.append({
+                "DesignationCode": dl['code'],
+                "DesignationDate": fake.date_between(joined).strftime('%m-%d-%Y'),
+                "DesignationDescription": dl['description'],
+                "MemberId": str(member_id),
+                "Timestamp": int(random_n_digits(7))
+            })
+    
+    # remove duplicates in pandas and return as a list of dicts
+    df = pd.DataFrame(designations)
+    df = df.drop_duplicates(subset = ["DesignationCode"])
+    
+    return df.to_dict('records')
+
 
 # combine above methods into a single method
 def get_person():
@@ -265,6 +299,8 @@ def get_person():
     person_dict['MemberOnlineStatusDate'] = ''
     person_dict['MemberReinstatementDate'] = ''
     person_dict['MemberStatusDate'] = ''
+    person_dict['MemberId'] = f'{AssociationId}{random_n_digits(5)}'
+    person_dict['Designations'] = list(sometimes(generate_designations(person_dict['MemberId'], person_dict['JoinedDate'])))
     
     return person_dict
 
@@ -278,6 +314,7 @@ def get_random_member():
     member_return = {
         'Member': {
             'AssociationId': AssociationId,
+            'Designations': person_dict['Designations'],
             'DirectoryOptOut': usually_no(),
             'DuesWaivedLocalFlag': usually_no(),
             'DuesWaivedNationalFlag': usually_no(),
@@ -295,7 +332,7 @@ def get_random_member():
             'MemberGeneration':  gen_gen(),
             'MemberHomeAddress': generate_address_dict(),
             'MemberHomePhone': generate_phone_dict(),
-            'MemberId': f'{AssociationId}{random_n_digits(5)}',
+            'MemberId': person_dict['MemberId'],
             'MemberLastName': person_dict['last'],
             'MemberLocalJoinedDate': person_dict['MemberLocalJoinedDate'],
             'MemberMLSAssociationId': f'{random_n_digits(5)}',                     # TODO - exact significance unknown
@@ -304,7 +341,7 @@ def get_random_member():
             'MemberNRDSInsertDate': person_dict['MemberNRDSInsertDate'],
             'MemberNationalDuesPaidDate': person_dict['MemberNationalDuesPaidDate'],
             'MemberNickname': sometimes(mimesis_generic.text.word()),
-            'MemberOccupationName': mimesis_generic.person.occupation(),
+            'MemberOccupationName': mimesis_generic.person.occupation(),           # TODO - random placeholder - all valid values??
             'MemberOfficeVoiceExtension': f'{random_n_digits(4)}',
             'MemberOnlineStatus': usually_yes(),
             'MemberOnlineStatusDate': person_dict['MemberOnlineStatusDate'],
@@ -334,7 +371,7 @@ def get_random_member():
             'StopEMailFlag': usually_no(),
             'StopFaxFlag': usually_no(),
             'StopMailFlag': usually_no(),
-            'Timestamp': int(random_n_digits(8)),
+            'Timestamp': int(random_n_digits(7)),
             'WebPage': mimesis_generic.internet.home_page(tld_type=TLDType.UTLD)
         }
     }
