@@ -1,6 +1,10 @@
 # pynrds
 pynrds will eventually be a complete Python library for the NAR NRDS API Service.
 
+## Installation
+```pip install pynrds```
+
+## Usage
 The NRDS API has a pretty simple structure, so querying it is straightforward using the `requests` module: 
 
 ```python
@@ -54,8 +58,30 @@ Additional endpoints and queries are similar, and I'll build them once I have a 
 
 The more interesting question, of course, is what can be done with JUST the data the NRDS API provides, using only Open-Source tools? For exploring those questions we're going to need sample data, so we can try new things and make complex mockups without the need to use or affect live NRDS information, or to post member data as part of learning how to use the data the API returns. So, my short-term goal is to create a full test set of simulated NRDS data that anyone can use, scale, and customize to their own needs, then create a dummy API for that test set that exactly mirrors the (typical, documented) behavior of the NRDS API. It should be possible to create a mock Association of any size, populate realistic but fake NRDS data to its "members", and then use it to test any imaginable application based on the NRDS API without the need to use it in early testing. 
 
-### Update 10/12/20: 
-Added a Designations section to `get_random_member()` to demonstrate the basic method - probabilities and other details still need to be fine-tuned. Examples below updated.
+### Update 10/12/20: Initial pypi release
+Pushed current build to pypi so it can be installed as a module. Added a Designations section to `get_random_member()` to demonstrate the basic method - probabilities and other details still need to be fine-tuned. Examples below updated. Added a modified `get_single_member()` method which should work on the beta NRDS API. 
+
+
+```python
+# NRDS Beta API url
+beta_base_url = 'https://beta.api.realtor.org/data'
+
+
+# get data for a single member, given
+# target member ID, user role, and sender member ID
+def get_single_member(member_id, user_role, sender_member_id):
+
+    payload = {
+        'UserRole'      : user_role,
+        'SenderMemberId': sender_member_id
+        }
+
+    url = f'{beta_base_url}/members/{member_id}'
+
+    reply = requests.post(url, payload)
+    return(reply)
+```
+
 
 ### Update 10/10/20: 
 Created and uploaded `get_member.py` which returns a `JSON` package of randomized member data in the same format as the NRDS API `/member/` endpoint. Tackled the easy elements first, this script will not generate simulated data for Certifications, Designations, etc (yet!) but the other information looks realistic enough for testing purposes. Ages, DOB, years of membership, NRDS insert dates, and all other info are random, but follow some rules to make the data realistic. The script's dependencies are all in the import section, notably `Delorean` and `Numpy`, as well as two different fake-data libraries: `mimesis` and `faker`, with `mimesis` doing the bulk of the work. The outputted addresses are a bit "European" in flavor, specifically British, but close enough. 
