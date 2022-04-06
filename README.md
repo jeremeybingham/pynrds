@@ -1,5 +1,7 @@
 # pynrds
-pynrds will eventually be a complete Python library for the NAR NRDS API Service.
+pynrds will eventually be a complete Python library for the (non-existent, but proposed) NAR NRDS RESTful API Service (assuming someone ever builds the latter and finishes the former)
+
+at any rate, there's some interesting stuff in here, particularly a `get_random_member()` function that generates good fake Realtor data for testing, and it was pretty easy to build it from the documentation alone, even if it's not something that, you know, exists.
 
 ## Installation
 ```pip install pynrds```
